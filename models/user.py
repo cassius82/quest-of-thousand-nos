@@ -101,3 +101,4 @@ def ensure_indexes(db):
     db.users.create_index("email", unique=True)
     db.attempts.create_index([("user_id", 1), ("date", -1)])
     db.attempts.create_index([("user_id", 1), ("created_at", -1)])
+    db.completed_combos.create_index([("user_id", 1), ("combo_id", 1)], unique=True)

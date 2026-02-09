@@ -3,7 +3,8 @@ from datetime import datetime, date, timedelta, timezone
 
 
 def log_attempt(db, user_id, description, nos_count, quest_domain, reflection_asked="",
-                reflection_learned="", reflection_control=""):
+                reflection_learned="", reflection_control="", combo_id=None,
+                opportunity_source="freeform"):
     today_str = date.today().isoformat()
     now = datetime.now(timezone.utc)
 
@@ -19,6 +20,8 @@ def log_attempt(db, user_id, description, nos_count, quest_domain, reflection_as
         "reflection_control": reflection_control.strip(),
         "unexpected_win": False,
         "win_description": "",
+        "combo_id": combo_id,
+        "opportunity_source": opportunity_source,
     }
 
     result = db.attempts.insert_one(attempt_doc)

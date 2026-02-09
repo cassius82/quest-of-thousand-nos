@@ -308,6 +308,66 @@ h2 { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em; margin-botto
 }
 .filter-bar select:focus { outline: none; border-color: var(--accent); }
 
+/* === Tabs === */
+.tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); }
+.tab {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all var(--transition);
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: inherit;
+}
+.tab:hover { color: var(--text-primary); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-count {
+    font-size: 0.75rem;
+    background: rgba(255,255,255,0.08);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    margin-left: 0.4rem;
+}
+
+/* === Category Pills === */
+.category-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.category-pill {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border-radius: 20px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: inherit;
+    transition: all var(--transition);
+}
+.category-pill:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+.category-pill.active { background: var(--accent); color: var(--bg-primary); border-color: var(--accent); }
+
+/* === Generator Stats === */
+.generator-stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    background: rgba(226,183,20,0.08);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(226,183,20,0.15);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    align-items: center;
+    flex-wrap: wrap;
+}
+.generator-stats strong { color: var(--accent); }
+
 /* === Opportunity Grid === */
 .opportunity-grid { display: flex; flex-direction: column; gap: 0.75rem; }
 .opportunity-card {
@@ -315,10 +375,14 @@ h2 { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em; margin-botto
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 1.15rem;
+    transition: border-color var(--transition);
 }
+.opportunity-card:hover { border-color: rgba(226,183,20,0.3); }
+.opportunity-card.generated { border-left: 3px solid var(--accent); }
 .opportunity-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
 .opportunity-header h3 { font-size: 1rem; font-weight: 600; }
 .opportunity-card p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem; }
+.opportunity-footer { display: flex; justify-content: space-between; align-items: center; }
 .difficulty {
     font-size: 0.75rem;
     font-weight: 600;
@@ -338,6 +402,34 @@ h2 { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em; margin-botto
     border-radius: 4px;
     color: var(--text-muted);
 }
+.btn-try {
+    padding: 0.35rem 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: rgba(226,183,20,0.15);
+    color: var(--accent);
+    border: 1px solid rgba(226,183,20,0.3);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all var(--transition);
+    white-space: nowrap;
+}
+.btn-try:hover { background: var(--accent); color: var(--bg-primary); }
+.btn-refresh {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all var(--transition);
+    margin-top: 1rem;
+}
+.btn-refresh:hover { background: var(--accent); color: var(--bg-primary); }
 
 /* === Pagination === */
 .pagination { display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 1.5rem; }
@@ -749,14 +841,34 @@ async function renderLog(app) {
     const meRes = await api('/api/me');
     const userDomain = meRes.ok ? meRes.data.user.quest_domain : 'general';
 
+    // Check for pre-fill from library
+    const prefill = window._prefillLog || null;
+    window._prefillLog = null;
+
+    const prefillDomain = prefill && prefill.domains ? prefill.domains[0] : userDomain;
+    const prefillDesc = prefill ? `${prefill.title}: ${prefill.description}` : '';
+
+    let prefillBanner = '';
+    if (prefill) {
+        prefillBanner = `
+            <div style="background:rgba(226,183,20,0.1);border:1px solid rgba(226,183,20,0.2);border-radius:var(--radius-sm);padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.9rem;">
+                <strong style="color:var(--accent);">Challenge:</strong> ${prefill.title}
+                ${prefill.combo_id ? '<span class="tag" style="margin-left:0.5rem;">Generated</span>' : ''}
+            </div>
+        `;
+    }
+
     app.innerHTML = `
         <div class="auth-card">
             <h1>Log a No</h1>
             <p class="auth-subtitle">What did you ask for? What happened?</p>
+            ${prefillBanner}
             <form id="log-form">
+                <input type="hidden" id="combo_id" value="${prefill && prefill.combo_id ? prefill.combo_id : ''}">
+                <input type="hidden" id="opportunity_source" value="${prefill ? prefill.opportunity_source : 'freeform'}">
                 <div class="form-group">
                     <label for="description">What did you attempt?</label>
-                    <textarea id="description" rows="3" required placeholder="I asked my boss for a raise..."></textarea>
+                    <textarea id="description" rows="3" required placeholder="I asked my boss for a raise...">${prefillDesc}</textarea>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -765,7 +877,7 @@ async function renderLog(app) {
                     </div>
                     <div class="form-group">
                         <label for="quest_domain">Domain</label>
-                        <select id="quest_domain">${domainOptions(userDomain)}</select>
+                        <select id="quest_domain">${domainOptions(prefillDomain)}</select>
                     </div>
                 </div>
                 <div class="reflection-toggle" id="reflection-toggle">
@@ -792,6 +904,8 @@ async function renderLog(app) {
     document.getElementById('log-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const nos = parseInt(document.getElementById('nos_count').value) || 1;
+        const comboId = document.getElementById('combo_id').value || null;
+        const oppSource = document.getElementById('opportunity_source').value || 'freeform';
         const res = await api('/api/attempts', {
             method: 'POST',
             body: JSON.stringify({
@@ -801,6 +915,8 @@ async function renderLog(app) {
                 reflection_asked: document.getElementById('reflection_asked').value,
                 reflection_learned: document.getElementById('reflection_learned').value,
                 reflection_control: document.getElementById('reflection_control').value,
+                combo_id: comboId,
+                opportunity_source: oppSource,
             }),
         });
         if (res.ok) {
@@ -983,36 +1099,111 @@ async function renderDetail(app, attemptId) {
 }
 
 // ─── Library ─────────────────────────────────────────────────────────
+let _libraryCache = null;
+let _libraryTab = 'curated';
+let _libraryDomain = '';
+let _libraryDifficulty = '';
+let _libraryCategory = '';
+
 async function renderLibrary(app) {
     app.innerHTML = '<p style="color:var(--text-muted)">Loading...</p>';
     const res = await api('/api/library');
     if (!res.ok) { flash(res.error, 'error'); return; }
 
-    const { opportunities, all_domains } = res.data;
-    window._libraryData = { opportunities: res.data, all_domains };
-
-    renderLibraryView(app, opportunities, all_domains, '', '');
+    _libraryCache = res.data;
+    renderLibraryView(app);
 }
 
-function renderLibraryView(app, opportunities, all_domains, selectedDomain, selectedDifficulty) {
+function _categoryLabel(cat) {
+    const labels = {
+        ultra_low_stakes: 'Ultra-Low Stakes',
+        social_friction: 'Social Friction',
+        career_asks: 'Career Asks',
+        creative_exposure: 'Creative Exposure',
+        sales_leverage: 'Sales & Leverage',
+        power_asks: 'Power Asks',
+    };
+    return labels[cat] || titleCase(cat.replace(/_/g, ' '));
+}
+
+function renderLibraryView(app) {
+    const data = _libraryCache;
+    if (!data) return;
+
+    const { curated, expanded, generated, all_domains, categories } = data;
+
+    // Determine which items to show
+    let items = [];
+    let source = 'curated';
+    if (_libraryTab === 'curated') {
+        items = curated || [];
+        source = 'curated';
+    } else if (_libraryTab === 'expanded') {
+        items = expanded || [];
+        source = 'curated';
+    } else if (_libraryTab === 'generated') {
+        items = generated || [];
+        source = 'generated';
+    }
+
+    // Apply client-side filters for curated/expanded
+    if (_libraryTab !== 'generated') {
+        if (_libraryDomain) items = items.filter(o => o.domains.includes(_libraryDomain));
+        if (_libraryDifficulty) items = items.filter(o => o.difficulty === parseInt(_libraryDifficulty));
+        if (_libraryTab === 'expanded' && _libraryCategory) {
+            items = items.filter(o => o.category === _libraryCategory);
+        }
+    }
+
+    const curatedCount = (curated || []).length;
+    const expandedCount = (expanded || []).length;
+    const generatedCount = (generated || []).length;
+
+    let categoryHtml = '';
+    if (_libraryTab === 'expanded' && categories && categories.length > 0) {
+        categoryHtml = `
+            <div class="category-pills">
+                <button class="category-pill ${_libraryCategory === '' ? 'active' : ''}" data-cat="">All</button>
+                ${categories.map(c => `
+                    <button class="category-pill ${_libraryCategory === c ? 'active' : ''}" data-cat="${c}">${_categoryLabel(c)}</button>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    let generatorStatsHtml = '';
+    if (_libraryTab === 'generated') {
+        generatorStatsHtml = `
+            <div class="generator-stats">
+                Showing <strong>${items.length}</strong> challenges generated just for you. New set daily.
+            </div>
+        `;
+    }
+
     let cardsHtml = '';
-    if (opportunities.length > 0) {
+    if (items.length > 0) {
         cardsHtml = `
             <div class="opportunity-grid">
-                ${opportunities.map(o => `
-                    <div class="opportunity-card">
+                ${items.map((o, i) => `
+                    <div class="opportunity-card ${_libraryTab === 'generated' ? 'generated' : ''}">
                         <div class="opportunity-header">
                             <h3>${o.title}</h3>
                             <span class="difficulty difficulty-${o.difficulty}">${DIFF_LABELS[o.difficulty]}</span>
                         </div>
                         <p>${o.description}</p>
-                        <div class="opportunity-domains">
-                            ${o.domains.map(d => `<span class="tag">${titleCase(d)}</span>`).join('')}
+                        <div class="opportunity-footer">
+                            <div class="opportunity-domains">
+                                ${o.domains.map(d => `<span class="tag">${titleCase(d)}</span>`).join('')}
+                            </div>
+                            <button class="btn-try" data-idx="${i}" data-source="${source}">Try This</button>
                         </div>
                     </div>
                 `).join('')}
             </div>
         `;
+        if (_libraryTab === 'generated') {
+            cardsHtml += `<button class="btn-refresh" id="refresh-generated">Refresh Challenges</button>`;
+        }
     } else {
         cardsHtml = '<div class="empty-state"><p>No opportunities match your filters.</p></div>';
     }
@@ -1020,37 +1211,105 @@ function renderLibraryView(app, opportunities, all_domains, selectedDomain, sele
     app.innerHTML = `
         <div class="section">
             <h1>Opportunity Library</h1>
-            <p class="section-subtitle">Curated challenges to practice hearing "no"</p>
+            <p class="section-subtitle">${curatedCount + expandedCount} curated + thousands of generated challenges</p>
+            <div class="tabs">
+                <button class="tab ${_libraryTab === 'curated' ? 'active' : ''}" data-tab="curated">Featured<span class="tab-count">${curatedCount}</span></button>
+                <button class="tab ${_libraryTab === 'expanded' ? 'active' : ''}" data-tab="expanded">New Challenges<span class="tab-count">${expandedCount}</span></button>
+                <button class="tab ${_libraryTab === 'generated' ? 'active' : ''}" data-tab="generated">Generated<span class="tab-count">${generatedCount}</span></button>
+            </div>
             <div class="filter-bar">
                 <select id="filter-domain">
                     <option value="">All Domains</option>
-                    ${all_domains.map(d => `<option value="${d}" ${selectedDomain === d ? 'selected' : ''}>${titleCase(d)}</option>`).join('')}
+                    ${all_domains.map(d => `<option value="${d}" ${_libraryDomain === d ? 'selected' : ''}>${titleCase(d)}</option>`).join('')}
                 </select>
                 <select id="filter-difficulty">
                     <option value="">All Difficulties</option>
-                    <option value="1" ${selectedDifficulty === '1' ? 'selected' : ''}>Easy</option>
-                    <option value="2" ${selectedDifficulty === '2' ? 'selected' : ''}>Medium</option>
-                    <option value="3" ${selectedDifficulty === '3' ? 'selected' : ''}>Hard</option>
-                    <option value="4" ${selectedDifficulty === '4' ? 'selected' : ''}>Expert</option>
+                    <option value="1" ${_libraryDifficulty === '1' ? 'selected' : ''}>Easy</option>
+                    <option value="2" ${_libraryDifficulty === '2' ? 'selected' : ''}>Medium</option>
+                    <option value="3" ${_libraryDifficulty === '3' ? 'selected' : ''}>Hard</option>
+                    <option value="4" ${_libraryDifficulty === '4' ? 'selected' : ''}>Expert</option>
                 </select>
             </div>
+            ${categoryHtml}
+            ${generatorStatsHtml}
             ${cardsHtml}
         </div>
     `;
 
+    // Tab handlers
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', async () => {
+            _libraryTab = tab.dataset.tab;
+            _libraryCategory = '';
+            if (_libraryTab === 'generated') {
+                // Fetch generated with current filters
+                let query = '/api/library/generate?count=10';
+                if (_libraryDomain) query += '&domain=' + encodeURIComponent(_libraryDomain);
+                if (_libraryDifficulty) query += '&difficulty=' + encodeURIComponent(_libraryDifficulty);
+                const r = await api(query);
+                if (r.ok) _libraryCache.generated = r.data.generated;
+            }
+            renderLibraryView(app);
+        });
+    });
+
+    // Filter handlers
     const filterHandler = async () => {
-        const domain = document.getElementById('filter-domain').value;
-        const difficulty = document.getElementById('filter-difficulty').value;
-        let query = '/api/library?';
-        if (domain) query += 'domain=' + encodeURIComponent(domain) + '&';
-        if (difficulty) query += 'difficulty=' + encodeURIComponent(difficulty);
-        const r = await api(query);
-        if (r.ok) {
-            renderLibraryView(app, r.data.opportunities, r.data.all_domains, domain, difficulty);
+        _libraryDomain = document.getElementById('filter-domain').value;
+        _libraryDifficulty = document.getElementById('filter-difficulty').value;
+        if (_libraryTab === 'generated') {
+            let query = '/api/library/generate?count=10';
+            if (_libraryDomain) query += '&domain=' + encodeURIComponent(_libraryDomain);
+            if (_libraryDifficulty) query += '&difficulty=' + encodeURIComponent(_libraryDifficulty);
+            const r = await api(query);
+            if (r.ok) _libraryCache.generated = r.data.generated;
         }
+        renderLibraryView(app);
     };
     document.getElementById('filter-domain').addEventListener('change', filterHandler);
     document.getElementById('filter-difficulty').addEventListener('change', filterHandler);
+
+    // Category pill handlers
+    document.querySelectorAll('.category-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+            _libraryCategory = pill.dataset.cat;
+            renderLibraryView(app);
+        });
+    });
+
+    // Try This buttons
+    document.querySelectorAll('.btn-try').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const idx = parseInt(btn.dataset.idx);
+            const oSource = btn.dataset.source;
+            const o = items[idx];
+            if (o) {
+                window._prefillLog = {
+                    title: o.title,
+                    description: o.description,
+                    domains: o.domains,
+                    combo_id: o.combo_id || null,
+                    opportunity_source: o.combo_id ? 'generated' : 'curated',
+                };
+                navigate('log');
+            }
+        });
+    });
+
+    // Refresh generated
+    const refreshBtn = document.getElementById('refresh-generated');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', async () => {
+            let query = '/api/library/generate?count=10';
+            if (_libraryDomain) query += '&domain=' + encodeURIComponent(_libraryDomain);
+            if (_libraryDifficulty) query += '&difficulty=' + encodeURIComponent(_libraryDifficulty);
+            const r = await api(query);
+            if (r.ok) {
+                _libraryCache.generated = r.data.generated;
+                renderLibraryView(app);
+            }
+        });
+    }
 }
 
 // ─── Settings ────────────────────────────────────────────────────────

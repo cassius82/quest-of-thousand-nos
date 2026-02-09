@@ -21,6 +21,8 @@ def create():
     reflection_asked = data.get("reflection_asked", "")
     reflection_learned = data.get("reflection_learned", "")
     reflection_control = data.get("reflection_control", "")
+    combo_id = data.get("combo_id")
+    opportunity_source = data.get("opportunity_source", "freeform")
 
     if not description:
         return jsonify({"ok": False, "error": "Please describe what you attempted."}), 400
@@ -30,11 +32,29 @@ def create():
     except (ValueError, TypeError):
         nos_count = 1
 
+    if opportunity_source not in ("curated", "generated", "freeform"):
+        opportunity_source = "freeform"
+
     db = current_app.db
     attempt = log_attempt(
         db, user.get_id(), description, nos_count, quest_domain,
         reflection_asked, reflection_learned, reflection_control,
+        combo_id=combo_id, opportunity_source=opportunity_source,
     )
+
+    # Auto-mark combo as complete if from generator
+    if combo_id:
+        from bson import ObjectId
+        from datetime import datetime, timezone
+        try:
+            db.completed_combos.insert_one({
+                "user_id": ObjectId(user.get_id()),
+                "combo_id": combo_id,
+                "completed_at": datetime.now(timezone.utc),
+                "attempt_id": attempt["_id"],
+            })
+        except Exception:
+            pass  # Duplicate
 
     return jsonify({"ok": True, "data": {"attempt": serialize_attempt(attempt)}}), 201
 
