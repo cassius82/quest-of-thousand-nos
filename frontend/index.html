@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Quest of a Thousand No's</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+/* === Reset & Base === */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --bg-card: #0f3460;
+    --text-primary: #e8e8e8;
+    --text-secondary: #a0a0b8;
+    --text-muted: #6b6b80;
+    --accent: #e2b714;
+    --accent-hover: #f0c832;
+    --success: #4ecca3;
+    --error: #e74c3c;
+    --info: #3498db;
+    --border: #2a2a4a;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.3);
+    --transition: 0.2s ease;
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+a { color: var(--accent); text-decoration: none; transition: color var(--transition); }
+a:hover { color: var(--accent-hover); }
+
+/* === Navigation === */
+.nav {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.nav-inner {
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.nav-logo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    cursor: pointer;
+}
+.nav-logo:hover { color: var(--accent-hover); }
+.nav-links { display: flex; gap: 1rem; flex-wrap: wrap; }
+.nav-links a {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+.nav-links a:hover { color: var(--text-primary); }
+
+/* === Container === */
+.container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    flex: 1;
+    width: 100%;
+}
+
+/* === Flash Messages === */
+.flash {
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+.flash-success {
+    background: rgba(78,204,163,0.15);
+    color: var(--success);
+    border: 1px solid rgba(78,204,163,0.3);
+}
+.flash-error {
+    background: rgba(231,76,60,0.15);
+    color: var(--error);
+    border: 1px solid rgba(231,76,60,0.3);
+}
+.flash-info {
+    background: rgba(52,152,219,0.15);
+    color: var(--info);
+    border: 1px solid rgba(52,152,219,0.3);
+}
+
+/* === Typography === */
+h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.5rem; }
+h2 { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+
+/* === Auth Card === */
+.auth-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    max-width: 420px;
+    margin: 2rem auto;
+}
+.auth-subtitle { color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem; }
+.auth-footer { text-align: center; margin-top: 1.5rem; color: var(--text-secondary); font-size: 0.9rem; }
+
+/* === Forms === */
+.form-group { margin-bottom: 1rem; }
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 0.35rem;
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: border-color var(--transition);
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+.form-group textarea { resize: vertical; }
+.form-group select { cursor: pointer; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+/* === Buttons === */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1.25rem;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all var(--transition);
+    text-decoration: none;
+}
+.btn-primary { background: var(--accent); color: var(--bg-primary); }
+.btn-primary:hover { background: var(--accent-hover); color: var(--bg-primary); }
+.btn-accent { background: var(--success); color: var(--bg-primary); }
+.btn-accent:hover { background: #5fd9b0; color: var(--bg-primary); }
+.btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-ghost:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+.btn-full { width: 100%; }
+.btn-large { padding: 0.85rem 1.5rem; font-size: 1rem; }
+
+/* === Dashboard === */
+.dashboard { display: flex; flex-direction: column; gap: 1.5rem; }
+.greeting h1 { font-size: 1.5rem; }
+.quest-domain { color: var(--text-secondary); font-size: 0.9rem; }
+
+/* Counter Card */
+.counter-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    text-align: center;
+}
+.counter-number {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+}
+.counter-label { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem; margin-bottom: 1rem; }
+.progress-bar { width: 100%; height: 8px; background: var(--bg-primary); border-radius: 4px; overflow: hidden; }
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--success));
+    border-radius: 4px;
+    transition: width 1s ease-out;
+}
+.progress-text { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.5rem; }
+
+/* Stats Row */
+.stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+.stat-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    text-align: center;
+}
+.stat-value { font-size: 1.75rem; font-weight: 700; color: var(--text-primary); }
+.stat-label { font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.1rem; }
+.stat-target { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+/* === Sections === */
+.section { margin-bottom: 1.5rem; }
+.section-subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; }
+
+/* === Attempt List === */
+.attempt-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.attempt-item {
+    display: block;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    transition: border-color var(--transition);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+.attempt-item:hover { border-color: var(--accent); color: var(--text-primary); }
+.attempt-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem; }
+.attempt-nos { font-weight: 700; color: var(--accent); font-size: 0.9rem; }
+.attempt-nos-large { font-size: 2rem; }
+.attempt-domain { font-size: 0.8rem; color: var(--text-muted); }
+.attempt-date { font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
+.attempt-desc { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.4; }
+
+/* === Badges === */
+.badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.35rem;
+}
+.badge-win { background: rgba(78,204,163,0.2); color: var(--success); }
+.link-more { display: block; margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary); cursor: pointer; }
+
+/* === Detail Card === */
+.detail-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+}
+.detail-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+.detail-domain { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem; }
+.detail-description { font-size: 1.05rem; line-height: 1.6; margin-bottom: 1.25rem; }
+
+/* Win Banner */
+.win-banner {
+    background: rgba(78,204,163,0.12);
+    border: 1px solid rgba(78,204,163,0.3);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    color: var(--success);
+}
+.win-banner p { margin-top: 0.35rem; color: var(--text-secondary); }
+.win-form { margin-bottom: 1.5rem; }
+
+/* Reflections */
+.reflection-section { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+.reflection-display { margin-bottom: 1rem; }
+.reflection-item { margin-bottom: 0.75rem; }
+.reflection-item strong { font-size: 0.85rem; color: var(--text-secondary); }
+.reflection-item p { font-size: 0.95rem; margin-top: 0.2rem; }
+.reflection-toggle { margin-bottom: 0.75rem; }
+.reflection-fields { margin-bottom: 1rem; }
+
+/* === Filter Bar === */
+.filter-bar { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.filter-bar select {
+    padding: 0.5rem 0.85rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+.filter-bar select:focus { outline: none; border-color: var(--accent); }
+
+/* === Opportunity Grid === */
+.opportunity-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+.opportunity-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 1.15rem;
+}
+.opportunity-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+.opportunity-header h3 { font-size: 1rem; font-weight: 600; }
+.opportunity-card p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 0.75rem; }
+.difficulty {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+.difficulty-1 { background: rgba(78,204,163,0.2); color: var(--success); }
+.difficulty-2 { background: rgba(52,152,219,0.2); color: var(--info); }
+.difficulty-3 { background: rgba(226,183,20,0.2); color: var(--accent); }
+.difficulty-4 { background: rgba(231,76,60,0.2); color: var(--error); }
+.opportunity-domains { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.tag {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.45rem;
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    color: var(--text-muted);
+}
+
+/* === Pagination === */
+.pagination { display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 1.5rem; }
+.page-info { font-size: 0.85rem; color: var(--text-muted); }
+
+/* === Empty State === */
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-secondary); }
+.empty-state p { margin-bottom: 1rem; }
+
+/* === Endgame === */
+.endgame { display: flex; flex-direction: column; gap: 2rem; }
+.endgame-hero { text-align: center; padding: 2rem 0; }
+.endgame-hero h1 { font-size: 2rem; color: var(--accent); }
+.endgame-number {
+    font-size: 5rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin: 0.5rem 0;
+}
+.endgame-subtitle { font-size: 1.1rem; color: var(--text-secondary); }
+.endgame-name { font-size: 1.25rem; font-weight: 600; margin-top: 1rem; }
+.endgame-date { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.25rem; }
+.endgame-cta { text-align: center; padding: 2rem 0; }
+.endgame-cta p { color: var(--text-secondary); margin-bottom: 1rem; }
+
+/* Timeline */
+.timeline { max-height: 400px; overflow-y: auto; }
+.timeline-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+}
+.timeline-date { color: var(--text-muted); min-width: 90px; }
+.timeline-nos { font-weight: 600; color: var(--accent); }
+
+/* Domain List */
+.domain-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.domain-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--border);
+}
+.domain-name { font-weight: 600; }
+.domain-nos { font-size: 0.85rem; color: var(--text-muted); }
+
+/* === Footer === */
+.footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+}
+.quote {
+    max-width: 480px;
+    margin: 0 auto 1rem;
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+.quote-author {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: normal;
+}
+.footer-text { font-size: 0.75rem; color: var(--text-muted); }
+
+/* === Responsive === */
+@media (max-width: 480px) {
+    .nav-links { gap: 0.6rem; }
+    .nav-links a { font-size: 0.8rem; }
+    .counter-number { font-size: 3rem; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+    .stat-value { font-size: 1.4rem; }
+    .form-row { grid-template-columns: 1fr; }
+    .auth-card { padding: 1.25rem; }
+    .filter-bar { flex-direction: column; }
+    .endgame-number { font-size: 3.5rem; }
+}
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-inner">
+            <a class="nav-logo" onclick="navigate('dashboard')">1000 No's</a>
+            <div class="nav-links" id="nav-links"></div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div id="flash-container"></div>
+        <div id="app"></div>
+    </main>
+
+    <footer class="footer">
+        <div class="quote" id="quote-container"></div>
+        <p class="footer-text">The Quest of a Thousand No's</p>
+    </footer>
+
+    <script>
+// ─── Config ───────────────────────────────────────────────────────────
+const API_BASE = window.API_BASE || 'http://localhost:5000';
+const DOMAINS = ['general','career','sales','creative','entrepreneurship','social','writing','networking'];
+const DIFF_LABELS = {1:'Easy',2:'Medium',3:'Hard',4:'Expert'};
+
+// ─── State ────────────────────────────────────────────────────────────
+function getToken() { return localStorage.getItem('jwt_token'); }
+function setToken(t) { localStorage.setItem('jwt_token', t); }
+function clearToken() { localStorage.removeItem('jwt_token'); }
+function isLoggedIn() { return !!getToken(); }
+
+// ─── API Helper ───────────────────────────────────────────────────────
+async function api(path, opts = {}) {
+    const url = API_BASE + path;
+    const headers = { 'Content-Type': 'application/json' };
+    const token = getToken();
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    try {
+        const res = await fetch(url, { ...opts, headers });
+        const data = await res.json();
+        if (res.status === 401) {
+            clearToken();
+            navigate('login');
+            return { ok: false, error: 'Session expired. Please log in again.' };
+        }
+        return data;
+    } catch (e) {
+        return { ok: false, error: 'Network error. Please try again.' };
+    }
+}
+
+// ─── Flash Messages ──────────────────────────────────────────────────
+function flash(message, category = 'info') {
+    const container = document.getElementById('flash-container');
+    const div = document.createElement('div');
+    div.className = 'flash flash-' + category;
+    div.textContent = message;
+    container.appendChild(div);
+    setTimeout(() => {
+        div.style.opacity = '0';
+        div.style.transition = 'opacity 0.4s ease';
+        setTimeout(() => div.remove(), 400);
+    }, 4000);
+}
+
+// ─── Router ──────────────────────────────────────────────────────────
+function navigate(route) {
+    window.location.hash = '#' + route;
+}
+
+function getRoute() {
+    const hash = window.location.hash.slice(1) || 'dashboard';
+    return hash;
+}
+
+window.addEventListener('hashchange', handleRoute);
+window.addEventListener('load', handleRoute);
+
+function handleRoute() {
+    const route = getRoute();
+    const app = document.getElementById('app');
+    document.getElementById('flash-container').innerHTML = '';
+
+    if (!isLoggedIn() && route !== 'login' && route !== 'register') {
+        navigate('login');
+        return;
+    }
+
+    updateNav();
+
+    if (route === 'login') renderLogin(app);
+    else if (route === 'register') renderRegister(app);
+    else if (route === 'dashboard') renderDashboard(app);
+    else if (route === 'log') renderLog(app);
+    else if (route === 'history') renderHistory(app);
+    else if (route.startsWith('attempt/')) renderDetail(app, route.split('/')[1]);
+    else if (route === 'library') renderLibrary(app);
+    else if (route === 'settings') renderSettings(app);
+    else if (route === 'endgame') renderEndgame(app);
+    else renderDashboard(app);
+}
+
+function updateNav() {
+    const nav = document.getElementById('nav-links');
+    if (isLoggedIn()) {
+        nav.innerHTML = `
+            <a onclick="navigate('dashboard')">Dashboard</a>
+            <a onclick="navigate('log')">Log</a>
+            <a onclick="navigate('history')">History</a>
+            <a onclick="navigate('library')">Library</a>
+            <a onclick="navigate('settings')">Settings</a>
+            <a onclick="clearToken();navigate('login')">Logout</a>
+        `;
+    } else {
+        nav.innerHTML = '';
+    }
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────
+function titleCase(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function truncate(s, n) { return s.length > n ? s.slice(0, n) + '...' : s; }
+
+function domainOptions(selected) {
+    return DOMAINS.map(d =>
+        `<option value="${d}" ${selected === d ? 'selected' : ''}>${titleCase(d)}</option>`
+    ).join('');
+}
+
+function animateCounter(el, target) {
+    if (target <= 0) return;
+    const duration = 1200;
+    const start = performance.now();
+    function step(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(target * eased).toLocaleString();
+        if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
+
+// ─── Login ───────────────────────────────────────────────────────────
+function renderLogin(app) {
+    app.innerHTML = `
+        <div class="auth-card">
+            <h1>Welcome Back</h1>
+            <p class="auth-subtitle">Continue your quest.</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Log In</button>
+            </form>
+            <p class="auth-footer">Don't have an account? <a onclick="navigate('register')">Start your quest</a></p>
+        </div>
+    `;
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const res = await api('/api/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ email, password }),
+        });
+        if (res.ok) {
+            setToken(res.data.token);
+            navigate('dashboard');
+        } else {
+            flash(res.error, 'error');
+        }
+    });
+}
+
+// ─── Register ────────────────────────────────────────────────────────
+function renderRegister(app) {
+    app.innerHTML = `
+        <div class="auth-card">
+            <h1>Begin Your Quest</h1>
+            <p class="auth-subtitle">Collect 1,000 rejections. Become unstoppable.</p>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="display_name">Your Name</label>
+                    <input type="text" id="display_name" required autofocus placeholder="What should we call you?">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required minlength="6" placeholder="At least 6 characters">
+                </div>
+                <div class="form-group">
+                    <label for="quest_domain">Quest Domain</label>
+                    <select id="quest_domain">${domainOptions('general')}</select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Start the Quest</button>
+            </form>
+            <p class="auth-footer">Already on the quest? <a onclick="navigate('login')">Log in</a></p>
+        </div>
+    `;
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const res = await api('/api/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({
+                display_name: document.getElementById('display_name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                quest_domain: document.getElementById('quest_domain').value,
+            }),
+        });
+        if (res.ok) {
+            setToken(res.data.token);
+            flash('Welcome to the Quest! Your journey of 1,000 No\'s begins now.', 'success');
+            navigate('dashboard');
+        } else {
+            flash(res.error, 'error');
+        }
+    });
+}
+
+// ─── Dashboard ───────────────────────────────────────────────────────
+async function renderDashboard(app) {
+    app.innerHTML = '<p style="color:var(--text-muted)">Loading...</p>';
+    const res = await api('/api/me');
+    if (!res.ok) { flash(res.error, 'error'); return; }
+
+    const { user, daily, weekly, recent, daily_quote } = res.data;
+
+    if (user.has_completed) {
+        navigate('endgame');
+        return;
+    }
+
+    const pct = Math.min(100, (user.total_nos / 1000 * 100)).toFixed(1);
+
+    let recentHtml = '';
+    if (recent && recent.length > 0) {
+        recentHtml = `
+            <div class="section">
+                <h2>Recent Attempts</h2>
+                <div class="attempt-list">
+                    ${recent.map(a => `
+                        <a class="attempt-item" onclick="navigate('attempt/${a.id}')">
+                            <div class="attempt-header">
+                                <span class="attempt-nos">+${a.nos_count}</span>
+                                <span class="attempt-date">${a.date}</span>
+                            </div>
+                            <p class="attempt-desc">${truncate(a.description, 80)}</p>
+                            ${a.unexpected_win ? '<span class="badge badge-win">Win!</span>' : ''}
+                        </a>
+                    `).join('')}
+                </div>
+                <a class="link-more" onclick="navigate('history')">View all attempts &rarr;</a>
+            </div>
+        `;
+    }
+
+    app.innerHTML = `
+        <div class="dashboard">
+            <div class="greeting">
+                <h1>Hello, ${user.display_name}</h1>
+                <p class="quest-domain">Quest: <strong>${titleCase(user.quest_domain)}</strong></p>
+            </div>
+            <div class="counter-card">
+                <div class="counter-number" id="counter">${user.total_nos}</div>
+                <div class="counter-label">No's Collected</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${pct}%"></div>
+                </div>
+                <div class="progress-text">${user.total_nos.toLocaleString()} / 1,000</div>
+            </div>
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value">${daily.nos}</div>
+                    <div class="stat-label">Today's No's</div>
+                    <div class="stat-target">Target: ${user.daily_target}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${weekly.nos}</div>
+                    <div class="stat-label">This Week</div>
+                    <div class="stat-target">Target: ${user.weekly_target}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${user.current_streak}</div>
+                    <div class="stat-label">Day Streak</div>
+                    <div class="stat-target">Best: ${user.longest_streak}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${user.total_wins}</div>
+                    <div class="stat-label">Unexpected Wins</div>
+                    <div class="stat-target">From ${user.total_attempts} attempts</div>
+                </div>
+            </div>
+            <a class="btn btn-primary btn-full btn-large" onclick="navigate('log')">Log a No</a>
+            ${recentHtml}
+        </div>
+    `;
+
+    const counterEl = document.getElementById('counter');
+    if (counterEl && user.total_nos > 0) animateCounter(counterEl, user.total_nos);
+
+    // Quote
+    const qc = document.getElementById('quote-container');
+    if (daily_quote) {
+        qc.innerHTML = `<p>"${daily_quote.text}"</p><span class="quote-author">&mdash; ${daily_quote.author}</span>`;
+    }
+}
+
+// ─── Log Attempt ─────────────────────────────────────────────────────
+async function renderLog(app) {
+    // Get user's domain for default
+    const meRes = await api('/api/me');
+    const userDomain = meRes.ok ? meRes.data.user.quest_domain : 'general';
+
+    app.innerHTML = `
+        <div class="auth-card">
+            <h1>Log a No</h1>
+            <p class="auth-subtitle">What did you ask for? What happened?</p>
+            <form id="log-form">
+                <div class="form-group">
+                    <label for="description">What did you attempt?</label>
+                    <textarea id="description" rows="3" required placeholder="I asked my boss for a raise..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nos_count">How many No's?</label>
+                        <input type="number" id="nos_count" value="1" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="quest_domain">Domain</label>
+                        <select id="quest_domain">${domainOptions(userDomain)}</select>
+                    </div>
+                </div>
+                <div class="reflection-toggle" id="reflection-toggle">
+                    <button type="button" class="btn btn-ghost" onclick="document.getElementById('reflection-fields').style.display='block';this.parentElement.style.display='none';">+ Add Reflection</button>
+                </div>
+                <div class="reflection-fields" id="reflection-fields" style="display:none;">
+                    <div class="form-group">
+                        <label for="reflection_asked">What exactly did you ask?</label>
+                        <textarea id="reflection_asked" rows="2" placeholder="Be specific about your request..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="reflection_learned">What did you learn?</label>
+                        <textarea id="reflection_learned" rows="2" placeholder="Any insights or patterns?"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="reflection_control">What was in your control?</label>
+                        <textarea id="reflection_control" rows="2" placeholder="Focus on what you can improve..."></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full btn-large">Log This No</button>
+            </form>
+        </div>
+    `;
+    document.getElementById('log-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nos = parseInt(document.getElementById('nos_count').value) || 1;
+        const res = await api('/api/attempts', {
+            method: 'POST',
+            body: JSON.stringify({
+                description: document.getElementById('description').value,
+                nos_count: nos,
+                quest_domain: document.getElementById('quest_domain').value,
+                reflection_asked: document.getElementById('reflection_asked').value,
+                reflection_learned: document.getElementById('reflection_learned').value,
+                reflection_control: document.getElementById('reflection_control').value,
+            }),
+        });
+        if (res.ok) {
+            flash(`+${nos} No${nos > 1 ? 's' : ''}! Keep going.`, 'success');
+            navigate('dashboard');
+        } else {
+            flash(res.error, 'error');
+        }
+    });
+}
+
+// ─── History ─────────────────────────────────────────────────────────
+async function renderHistory(app) {
+    const urlParams = new URLSearchParams(window.location.hash.split('?')[1] || '');
+    const page = parseInt(urlParams.get('page')) || 1;
+
+    app.innerHTML = '<p style="color:var(--text-muted)">Loading...</p>';
+    const res = await api(`/api/attempts?page=${page}`);
+    if (!res.ok) { flash(res.error, 'error'); return; }
+
+    const { attempts, total, total_pages } = res.data;
+    const currentPage = res.data.page;
+
+    let listHtml = '';
+    if (attempts.length > 0) {
+        listHtml = `
+            <div class="attempt-list">
+                ${attempts.map(a => `
+                    <a class="attempt-item" onclick="navigate('attempt/${a.id}')">
+                        <div class="attempt-header">
+                            <span class="attempt-nos">+${a.nos_count}</span>
+                            <span class="attempt-domain">${titleCase(a.quest_domain)}</span>
+                            <span class="attempt-date">${a.date}</span>
+                        </div>
+                        <p class="attempt-desc">${truncate(a.description, 120)}</p>
+                        ${a.unexpected_win ? '<span class="badge badge-win">Unexpected Win!</span>' : ''}
+                    </a>
+                `).join('')}
+            </div>
+        `;
+        if (total_pages > 1) {
+            listHtml += `
+                <div class="pagination">
+                    ${currentPage > 1 ? `<a class="btn btn-ghost" onclick="navigate('history?page=${currentPage-1}')">&larr; Newer</a>` : ''}
+                    <span class="page-info">Page ${currentPage} of ${total_pages}</span>
+                    ${currentPage < total_pages ? `<a class="btn btn-ghost" onclick="navigate('history?page=${currentPage+1}')">Older &rarr;</a>` : ''}
+                </div>
+            `;
+        }
+    } else {
+        listHtml = `
+            <div class="empty-state">
+                <p>No attempts logged yet.</p>
+                <a class="btn btn-primary" onclick="navigate('log')">Log Your First No</a>
+            </div>
+        `;
+    }
+
+    app.innerHTML = `
+        <div class="section">
+            <h1>Attempt History</h1>
+            <p class="section-subtitle">${total} total attempts logged</p>
+            ${listHtml}
+        </div>
+    `;
+}
+
+// ─── Attempt Detail ──────────────────────────────────────────────────
+async function renderDetail(app, attemptId) {
+    app.innerHTML = '<p style="color:var(--text-muted)">Loading...</p>';
+    const res = await api(`/api/attempts/${attemptId}`);
+    if (!res.ok) { flash(res.error, 'error'); navigate('history'); return; }
+
+    const a = res.data.attempt;
+    const hasReflection = a.reflection_asked || a.reflection_learned || a.reflection_control;
+
+    let winBanner = '';
+    if (a.unexpected_win) {
+        winBanner = `
+            <div class="win-banner">
+                <strong>Unexpected Win!</strong>
+                ${a.win_description ? `<p>${a.win_description}</p>` : ''}
+            </div>
+        `;
+    }
+
+    let reflectionDisplay = '';
+    if (hasReflection) {
+        reflectionDisplay = '<div class="reflection-display">';
+        if (a.reflection_asked) reflectionDisplay += `<div class="reflection-item"><strong>What I asked:</strong><p>${a.reflection_asked}</p></div>`;
+        if (a.reflection_learned) reflectionDisplay += `<div class="reflection-item"><strong>What I learned:</strong><p>${a.reflection_learned}</p></div>`;
+        if (a.reflection_control) reflectionDisplay += `<div class="reflection-item"><strong>What was in my control:</strong><p>${a.reflection_control}</p></div>`;
+        reflectionDisplay += '</div>';
+    }
+
+    app.innerHTML = `
+        <div class="detail-card">
+            <div class="detail-header">
+                <span class="attempt-nos attempt-nos-large">+${a.nos_count}</span>
+                <span class="attempt-date">${a.date}</span>
+            </div>
+            <p class="detail-domain">${titleCase(a.quest_domain)}</p>
+            <p class="detail-description">${a.description}</p>
+            ${winBanner}
+            <div class="win-form">
+                ${!a.unexpected_win ? `
+                    <div class="form-group">
+                        <label for="win_description">Did something unexpected happen?</label>
+                        <input type="text" id="win_description" placeholder="Describe the win...">
+                    </div>
+                    <button class="btn btn-accent" id="win-btn">Mark as Unexpected Win</button>
+                ` : `
+                    <button class="btn btn-ghost" id="win-btn">Remove Win</button>
+                `}
+            </div>
+            <div class="reflection-section">
+                <h2>Reflection</h2>
+                ${reflectionDisplay}
+                <div class="reflection-toggle" id="reflection-toggle">
+                    <button type="button" class="btn btn-ghost" id="toggle-reflection-btn">${hasReflection ? 'Edit Reflection' : '+ Add Reflection'}</button>
+                </div>
+                <div class="reflection-fields" id="reflection-fields" style="display:none;">
+                    <div class="form-group">
+                        <label for="reflection_asked">What exactly did you ask?</label>
+                        <textarea id="reflection_asked" rows="2">${a.reflection_asked || ''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="reflection_learned">What did you learn?</label>
+                        <textarea id="reflection_learned" rows="2">${a.reflection_learned || ''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="reflection_control">What was in your control?</label>
+                        <textarea id="reflection_control" rows="2">${a.reflection_control || ''}</textarea>
+                    </div>
+                    <button class="btn btn-primary" id="save-reflection-btn">Save Reflection</button>
+                </div>
+            </div>
+            <a class="link-more" onclick="navigate('history')">&larr; Back to history</a>
+        </div>
+    `;
+
+    // Win toggle
+    document.getElementById('win-btn').addEventListener('click', async () => {
+        const winDesc = document.getElementById('win_description');
+        const winRes = await api(`/api/attempts/${attemptId}/win`, {
+            method: 'POST',
+            body: JSON.stringify({ win_description: winDesc ? winDesc.value : '' }),
+        });
+        if (winRes.ok) {
+            flash(winRes.data.unexpected_win ? 'Unexpected win recorded!' : 'Win removed.', winRes.data.unexpected_win ? 'success' : 'info');
+            renderDetail(app, attemptId);
+        } else {
+            flash(winRes.error, 'error');
+        }
+    });
+
+    // Reflection toggle
+    document.getElementById('toggle-reflection-btn').addEventListener('click', () => {
+        document.getElementById('reflection-fields').style.display = 'block';
+        document.getElementById('reflection-toggle').style.display = 'none';
+    });
+
+    // Save reflection
+    document.getElementById('save-reflection-btn').addEventListener('click', async () => {
+        const refRes = await api(`/api/attempts/${attemptId}/reflection`, {
+            method: 'POST',
+            body: JSON.stringify({
+                reflection_asked: document.getElementById('reflection_asked').value,
+                reflection_learned: document.getElementById('reflection_learned').value,
+                reflection_control: document.getElementById('reflection_control').value,
+            }),
+        });
+        if (refRes.ok) {
+            flash('Reflection saved.', 'success');
+            renderDetail(app, attemptId);
+        } else {
+            flash(refRes.error, 'error');
+        }
+    });
+}
+
+// ─── Library ─────────────────────────────────────────────────────────
+async function renderLibrary(app) {
+    app.innerHTML = '<p style="color:var(--text-muted)">Loading...</p>';
+    const res = await api('/api/library');
+    if (!res.ok) { flash(res.error, 'error'); return; }
+
+    const { opportunities, all_domains } = res.data;
+    window._libraryData = { opportunities: res.data, all_domains };
+
+    renderLibraryView(app, opportunities, all_domains, '', '');
+}
+
+function renderLibraryView(app, opportunities, all_domains, selectedDomain, selectedDifficulty) {
+    let cardsHtml = '';
+    if (opportunities.length > 0) {
+        cardsHtml = `
+            <div class="opportunity-grid">
+                ${opportunities.map(o => `
+                    <div class="opportunity-card">
+                        <div class="opportunity-header">
+                            <h3>${o.title}</h3>
+                            <span class="difficulty difficulty-${o.difficulty}">${DIFF_LABELS[o.difficulty]}</span>
+                        </div>
+                        <p>${o.description}</p>
+                        <div class="opportunity-domains">
+                            ${o.domains.map(d => `<span class="tag">${titleCase(d)}</span>`).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else {
+        cardsHtml = '<div class="empty-state"><p>No opportunities match your filters.</p></div>';
+    }
+
+    app.innerHTML = `
+        <div class="section">
+            <h1>Opportunity Library</h1>
+            <p class="section-subtitle">Curated challenges to practice hearing "no"</p>
+            <div class="filter-bar">
+                <select id="filter-domain">
+                    <option value="">All Domains</option>
+                    ${all_domains.map(d => `<option value="${d}" ${selectedDomain === d ? 'selected' : ''}>${titleCase(d)}</option>`).join('')}
+                </select>
+                <select id="filter-difficulty">
+                    <option value="">All Difficulties</option>
+                    <option value="1" ${selectedDifficulty === '1' ? 'selected' : ''}>Easy</option>
+                    <option value="2" ${selectedDifficulty === '2' ? 'selected' : ''}>Medium</option>
+                    <option value="3" ${selectedDifficulty === '3' ? 'selected' : ''}>Hard</option>
+                    <option value="4" ${selectedDifficulty === '4' ? 'selected' : ''}>Expert</option>
+                </select>
+            </div>
+            ${cardsHtml}
+        </div>
+    `;
+
+    const filterHandler = async () => {
+        const domain = document.getElementById('filter-domain').value;
+        const difficulty = document.getElementById('filter-difficulty').value;
+        let query = '/api/library?';
+        if (domain) query += 'domain=' + encodeURIComponent(domain) + '&';
+        if (difficulty) query += 'difficulty=' + encodeURIComponent(difficulty);
+        const r = await api(query);
+        if (r.ok) {
+            renderLibraryView(app, r.data.opportunities, r.data.all_domains, domain, difficulty);
+        }
+    };
+    document.getElementById('filter-domain').addEventListener('change', filterHandler);
+    document.getElementById('filter-difficulty').addEventListener('change', filterHandler);
+}
+
+// ─── Settings ────────────────────────────────────────────────────────
+async function renderSettings(app) {
+    app.innerHTML = '<p style="color:var(--text-muted)">Loading...</p>';
+    const res = await api('/api/me');
+    if (!res.ok) { flash(res.error, 'error'); return; }
+
+    const user = res.data.user;
+
+    app.innerHTML = `
+        <div class="auth-card">
+            <h1>Settings</h1>
+            <form id="settings-form">
+                <div class="form-group">
+                    <label for="display_name">Display Name</label>
+                    <input type="text" id="display_name" value="${user.display_name}" required>
+                </div>
+                <div class="form-group">
+                    <label for="quest_domain">Quest Domain</label>
+                    <select id="quest_domain">${domainOptions(user.quest_domain)}</select>
+                </div>
+                <div class="form-group">
+                    <label for="daily_target">Daily Target (No's per day)</label>
+                    <input type="number" id="daily_target" value="${user.daily_target}" min="1" max="50">
+                </div>
+                <div class="form-group">
+                    <label for="weekly_target">Weekly Target (No's per week)</label>
+                    <input type="number" id="weekly_target" value="${user.weekly_target}" min="1" max="200">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Save Settings</button>
+            </form>
+        </div>
+    `;
+
+    document.getElementById('settings-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const r = await api('/api/me/settings', {
+            method: 'PUT',
+            body: JSON.stringify({
+                display_name: document.getElementById('display_name').value,
+                quest_domain: document.getElementById('quest_domain').value,
+                daily_target: parseInt(document.getElementById('daily_target').value) || 3,
+                weekly_target: parseInt(document.getElementById('weekly_target').value) || 15,
+            }),
+        });
+        if (r.ok) {
+            flash('Settings updated.', 'success');
+            navigate('dashboard');
+        } else {
+            flash(r.error, 'error');
+        }
+    });
+}
+
+// ─── Endgame ─────────────────────────────────────────────────────────
+async function renderEndgame(app) {
+    app.innerHTML = '<p style="color:var(--text-muted)">Loading...</p>';
+    const res = await api('/api/endgame');
+    if (!res.ok) {
+        if (res.error === 'Quest not yet complete.') {
+            navigate('dashboard');
+            return;
+        }
+        flash(res.error, 'error');
+        return;
+    }
+
+    const { user, daily, domains } = res.data;
+    const completedDate = user.completed_at ? new Date(user.completed_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+
+    let timelineHtml = '';
+    if (daily && daily.length > 0) {
+        timelineHtml = `
+            <div class="section">
+                <h2>Your Journey</h2>
+                <div class="timeline">
+                    ${daily.map(d => `
+                        <div class="timeline-item">
+                            <span class="timeline-date">${d.date}</span>
+                            <span class="timeline-nos">+${d.nos}</span>
+                            ${d.wins > 0 ? `<span class="badge badge-win">${d.wins} win${d.wins > 1 ? 's' : ''}</span>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    let domainsHtml = '';
+    if (domains && domains.length > 0) {
+        domainsHtml = `
+            <div class="section">
+                <h2>Domains Conquered</h2>
+                <div class="domain-list">
+                    ${domains.map(d => `
+                        <div class="domain-item">
+                            <span class="domain-name">${titleCase(d.domain)}</span>
+                            <span class="domain-nos">${d.nos} no's from ${d.attempts} attempts</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    app.innerHTML = `
+        <div class="endgame">
+            <div class="endgame-hero">
+                <h1>Quest Complete</h1>
+                <div class="endgame-number">1,000</div>
+                <p class="endgame-subtitle">No's collected. You are unstoppable.</p>
+                <p class="endgame-name">${user.display_name}</p>
+                ${completedDate ? `<p class="endgame-date">Completed ${completedDate}</p>` : ''}
+            </div>
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value">${user.total_nos}</div>
+                    <div class="stat-label">Total No's</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${user.total_attempts}</div>
+                    <div class="stat-label">Total Attempts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${user.total_wins}</div>
+                    <div class="stat-label">Unexpected Wins</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${user.longest_streak}</div>
+                    <div class="stat-label">Longest Streak</div>
+                </div>
+            </div>
+            ${timelineHtml}
+            ${domainsHtml}
+            <div class="endgame-cta">
+                <p>The quest is complete, but the journey continues.</p>
+                <a class="btn btn-accent btn-large" onclick="navigate('log')">Keep Going</a>
+            </div>
+        </div>
+    `;
+}
+    </script>
+</body>
+</html>
